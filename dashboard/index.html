@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教學訓練計畫主持人工作坊 - 報名現況儀表板</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(-45deg, #1e0338, #4a0d7a, #701a9e, #9c1bc2);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: white;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        /* Loading 動畫 */
+        .loader {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-left-color: #d946ef;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="min-h-screen relative p-6 md:p-10">
+
+    <!-- 背景裝飾 -->
+    <div class="fixed top-[-10%] left-[-10%] w-96 h-96 bg-fuchsia-600 rounded-full mix-blend-multiply filter blur-[128px] opacity-50 animate-pulse pointer-events-none"></div>
+    <div class="fixed bottom-[-10%] right-[-10%] w-96 h-96 bg-blue-600 rounded-full mix-blend-multiply filter blur-[128px] opacity-50 animate-pulse pointer-events-none" style="animation-delay: 2s;"></div>
+
+    <div class="max-w-6xl mx-auto relative z-10">
+        <!-- 標題區塊 -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4 glass-panel p-6 rounded-3xl">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-pink-300 to-fuchsia-300">
+                    📊 報名現況儀表板
+                </h1>
+                <p class="text-purple-200 mt-2 font-medium">教學訓練計畫主持人工作坊</p>
+            </div>
+            <button onclick="fetchData()" class="bg-white/10 hover:bg-white/20 border border-white/30 transition-colors px-6 py-3 rounded-full font-bold flex items-center gap-2">
+                🔄 重新整理
+            </button>
+        </div>
+
+        <!-- 載入中畫面 -->
+        <div id="loading" class="flex flex-col items-center justify-center py-20">
+            <div class="loader mb-4"></div>
+            <p class="text-purple-200 font-bold animate-pulse">正在從 Google Sheets 載入最新資料...</p>
+        </div>
+
+        <!-- 錯誤訊息畫面 -->
+        <div id="errorMsg" class="hidden bg-red-500/20 border border-red-500/50 text-red-100 p-6 rounded-2xl text-center backdrop-blur-md">
+            <h3 class="text-xl font-bold mb-2">⚠️ 資料讀取失敗</h3>
+            <p id="errorText">請確認您的 Google Sheets 共用設定已設為「知道連結的使用者皆可查看」。</p>
+        </div>
+
+        <!-- 儀表板內容 (預設隱藏，載入後顯示) -->
+        <div id="dashboardContent" class="hidden space-y-8">
+            
+            <!-- 頂部數據卡片 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- 總報名人數 -->
+                <div class="glass-panel p-6 rounded-3xl flex items-center gap-6 transform transition hover:scale-105">
+                    <div class="text-5xl bg-gradient-to-br from-fuchsia-400 to-purple-600 w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg">👥</div>
+                    <div>
+                        <p class="text-purple-200 text-sm font-bold mb-1">總報名人數</p>
+                        <p class="text-4xl font-black" id="totalCount">0</p>
+                    </div>
+                </div>
+                <!-- 實體參與人數 -->
+                <div class="glass-panel p-6 rounded-3xl flex items-center gap-6 transform transition hover:scale-105">
+                    <div class="text-5xl bg-gradient-to-br from-blue-400 to-indigo-600 w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg">🏢</div>
+                    <div>
+                        <p class="text-purple-200 text-sm font-bold mb-1">實體參與</p>
+                        <p class="text-4xl font-black" id="physicalCount">0</p>
+                    </div>
+                </div>
+                <!-- 線上參與人數 -->
+                <div class="glass-panel p-6 rounded-3xl flex items-center gap-6 transform transition hover:scale-105">
+                    <div class="text-5xl bg-gradient-to-br from-green-400 to-emerald-600 w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg">🌐</div>
+                    <div>
+                        <p class="text-purple-200 text-sm font-bold mb-1">線上參與</p>
+                        <p class="text-4xl font-black" id="onlineCount">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 圖表區塊 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <!-- 參與方式圓餅圖 -->
+                <div class="glass-panel p-6 rounded-3xl flex flex-col items-center">
+                    <h3 class="text-lg font-bold text-purple-200 mb-6 text-center w-full border-b border-white/10 pb-4">💻 參與方式分佈</h3>
+                    <div class="relative w-full aspect-square max-w-[280px]">
+                        <canvas id="participationChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- 計畫主持人比例 -->
+                <div class="glass-panel p-6 rounded-3xl flex flex-col items-center">
+                    <h3 class="text-lg font-bold text-purple-200 mb-6 text-center w-full border-b border-white/10 pb-4">👑 計畫主持人比例</h3>
+                    <div class="relative w-full aspect-square max-w-[280px]">
+                        <canvas id="directorChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- 負責職類長條圖 (佔據兩格或一格) -->
+                <div class="glass-panel p-6 rounded-3xl lg:col-span-3">
+                    <h3 class="text-lg font-bold text-purple-200 mb-6 border-b border-white/10 pb-4">📋 負責職類統計</h3>
+                    <div class="relative w-full h-64 md:h-80">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Google Sheet 設定
+        const sheetId = '12PkIByUr-lJmVOwj854h6YS6QqG8yqsIlhIPRy00HJU';
+        const sheetName = encodeURIComponent('工作坊報名資料');
+        // 使用 Google Visualization API 直接讀取公開試算表
+        const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json&sheet=${sheetName}`;
+
+        // Chart 實例存儲，方便更新時銷毀舊圖表
+        let charts = {};
+
+        // 通用的 Chart.js 文字與顏色設定
+        Chart.defaults.color = '#e9d5ff'; // purple-200
+        Chart.defaults.font.family = "'Noto Sans TC', sans-serif";
+        const chartColors = ['#d946ef', '#3b82f6', '#10b981', '#f59e0b', '#6366f1', '#ec4899', '#8b5cf6', '#14b8a6', '#f43f5e', '#84cc16'];
+
+        async function fetchData() {
+            // 切換 UI 狀態
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('dashboardContent').classList.add('hidden');
+            document.getElementById('errorMsg').classList.add('hidden');
+
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                
+                // Google Visualization API 會回傳 /*O_o*/ 開頭的字串，需擷取出 JSON
+                const jsonString = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
+                const data = JSON.parse(jsonString);
+                
+                // 處理資料
+                processData(data.table.rows);
+
+                // 顯示儀表板
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('dashboardContent').classList.remove('hidden');
+
+            } catch (error) {
+                console.error("資料讀取失敗：", error);
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('errorMsg').classList.remove('hidden');
+            }
+        }
+
+        function processData(rows) {
+            let total = 0;
+            let physical = 0;
+            let online = 0;
+            
+            let participationCounts = { '實體': 0, '線上': 0 };
+            let directorCounts = { '是': 0, '否': 0 };
+            let categoryCounts = {};
+
+            // 依據表頭順序：0:時間, 1:姓名, 2:機構, 3:職稱, 4:職類, 5:主持人, 6:參與方式, 7:Email, 8:電話
+            rows.forEach(row => {
+                // 如果第一欄(時間)或第二欄(姓名)為空，代表可能是空行，跳過
+                if (!row.c || !row.c[0] || !row.c[1] || !row.c[1].v) return;
+                
+                total++;
+
+                const category = row.c[4] ? row.c[4].v : '未填寫';
+                const isDirector = row.c[5] ? row.c[5].v : '未填寫';
+                const participation = row.c[6] ? row.c[6].v : '未填寫';
+
+                // 計算參與方式
+                if (participation.includes('實體')) { physical++; participationCounts['實體']++; }
+                else if (participation.includes('線上')) { online++; participationCounts['線上']++; }
+
+                // 計算主持人
+                if (isDirector.includes('是') || isDirector === 'yes') directorCounts['是']++;
+                else directorCounts['否']++;
+
+                // 計算職類
+                categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+            });
+
+            // 更新數字 UI
+            document.getElementById('totalCount').innerText = total;
+            document.getElementById('physicalCount').innerText = physical;
+            document.getElementById('onlineCount').innerText = online;
+
+            // 繪製圖表
+            renderParticipationChart(participationCounts);
+            renderDirectorChart(directorCounts);
+            renderCategoryChart(categoryCounts);
+        }
+
+        function createOrUpdateChart(chartId, config) {
+            const ctx = document.getElementById(chartId).getContext('2d');
+            if (charts[chartId]) {
+                charts[chartId].destroy();
+            }
+            charts[chartId] = new Chart(ctx, config);
+        }
+
+        function renderParticipationChart(data) {
+            createOrUpdateChart('participationChart', {
+                type: 'doughnut',
+                data: {
+                    labels: ['實體參與', '線上參與'],
+                    datasets: [{
+                        data: [data['實體'], data['線上']],
+                        backgroundColor: ['#3b82f6', '#10b981'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        function renderDirectorChart(data) {
+            createOrUpdateChart('directorChart', {
+                type: 'pie',
+                data: {
+                    labels: ['是計畫主持人', '尚未擔任'],
+                    datasets: [{
+                        data: [data['是'], data['否']],
+                        backgroundColor: ['#d946ef', '#f472b6'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        }
+
+        function renderCategoryChart(data) {
+            // 排序職類，由高到低
+            const sortedCategories = Object.keys(data).sort((a, b) => data[b] - data[a]);
+            const values = sortedCategories.map(cat => data[cat]);
+
+            createOrUpdateChart('categoryChart', {
+                type: 'bar',
+                data: {
+                    labels: sortedCategories,
+                    datasets: [{
+                        label: '報名人數',
+                        data: values,
+                        backgroundColor: chartColors,
+                        borderRadius: 8,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 頁面載入時自動抓取資料
+        window.onload = fetchData;
+    </script>
+</body>
+</html>
