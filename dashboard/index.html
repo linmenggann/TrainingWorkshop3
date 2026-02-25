@@ -59,7 +59,10 @@
                 <h1 class="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-pink-300 to-fuchsia-300">
                     📊 報名現況儀表板
                 </h1>
-                <p class="text-purple-200 mt-2 font-medium">教學訓練計畫主持人工作坊</p>
+                <div class="flex flex-wrap items-center gap-3 mt-2">
+                    <p class="text-purple-200 font-medium">教學訓練計畫主持人工作坊</p>
+                    <span id="statusBadge" class="bg-white/10 text-purple-200 border border-white/20 px-3 py-1 rounded-full text-sm font-bold">讀取中...</span>
+                </div>
             </div>
             <button onclick="fetchData()" class="bg-white/10 hover:bg-white/20 border border-white/30 transition-colors px-6 py-3 rounded-full font-bold flex items-center gap-2">
                 🔄 重新整理
@@ -88,7 +91,10 @@
                     <div class="text-5xl bg-gradient-to-br from-fuchsia-400 to-purple-600 w-20 h-20 rounded-2xl flex items-center justify-center shadow-lg">👥</div>
                     <div>
                         <p class="text-purple-200 text-sm font-bold mb-1">總報名人數</p>
-                        <p class="text-4xl font-black" id="totalCount">0</p>
+                        <div class="flex items-baseline gap-2">
+                            <p class="text-4xl font-black" id="totalCount">0</p>
+                            <p class="text-xl text-purple-300 font-bold">/ 4</p>
+                        </div>
                     </div>
                 </div>
                 <!-- 實體參與人數 -->
@@ -215,10 +221,19 @@
                 categoryCounts[category] = (categoryCounts[category] || 0) + 1;
             });
 
-            // 更新數字 UI
+            // 更新數字 UI 與 額滿狀態
             document.getElementById('totalCount').innerText = total;
             document.getElementById('physicalCount').innerText = physical;
             document.getElementById('onlineCount').innerText = online;
+            
+            const statusBadge = document.getElementById('statusBadge');
+            if (total >= 4) {
+                statusBadge.innerText = '🔴 已額滿';
+                statusBadge.className = 'bg-red-500/20 text-red-300 border border-red-500/50 px-3 py-1 rounded-full text-sm font-bold animate-pulse';
+            } else {
+                statusBadge.innerText = '🟢 開放報名中';
+                statusBadge.className = 'bg-green-500/20 text-green-300 border border-green-500/50 px-3 py-1 rounded-full text-sm font-bold';
+            }
 
             // 繪製圖表
             renderParticipationChart(participationCounts);
