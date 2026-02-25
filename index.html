@@ -9,15 +9,20 @@
     <style>
         body {
             font-family: 'Noto Sans TC', sans-serif;
-            background: linear-gradient(-45deg, #3b0764, #6b21a8, #9333ea, #d946ef);
-            background-size: 400% 400%;
+            /* 將圖片作為背景，並加上半透明的紫色漸層遮罩以確保文字易讀性 */
+            background: linear-gradient(-45deg, rgba(59, 7, 100, 0.85), rgba(107, 33, 168, 0.85), rgba(147, 51, 234, 0.85), rgba(217, 70, 239, 0.85)),
+                        url('https://raw.githubusercontent.com/linmenggann/TrainingWorkshop3/main/DSC00045.jpg');
+            background-size: 400% 400%, cover;
+            background-position: 0% 50%, center;
+            background-attachment: fixed, fixed;
+            background-repeat: no-repeat;
             animation: gradientBG 15s ease infinite;
         }
 
         @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            0% { background-position: 0% 50%, center; }
+            50% { background-position: 100% 50%, center; }
+            100% { background-position: 0% 50%, center; }
         }
 
         .glass-panel {
