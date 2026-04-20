@@ -432,6 +432,100 @@
 
   .toast.show { transform: translateX(-50%) translateY(0); }
 
+  /* Capacity banner */
+  .capacity-banner {
+    margin: 30px 0 0;
+    padding: 20px 26px;
+    border-radius: 20px;
+    background: var(--glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    justify-content: space-between;
+  }
+  .capacity-banner .left { display: flex; align-items: center; gap: 14px; }
+  .capacity-banner .icon { font-size: 36px; }
+  .capacity-banner .title { font-size: 16px; font-weight: 700; letter-spacing: 1px; }
+  .capacity-banner .sub { font-size: 13px; color: var(--text-soft); margin-top: 2px; }
+  .capacity-banner .count-pill {
+    font-size: 18px; font-weight: 800;
+    padding: 8px 18px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #ffd86b, #fa71cd);
+    color: #4a148c;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+  .capacity-banner.full {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.35), rgba(250, 113, 205, 0.35));
+    border-color: rgba(252, 165, 165, 0.6);
+    animation: fullPulse 2.4s ease-in-out infinite;
+  }
+  .capacity-banner.full .count-pill {
+    background: #fff;
+    color: #b91c1c;
+  }
+  @keyframes fullPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); }
+    50% { box-shadow: 0 0 0 16px rgba(239, 68, 68, 0); }
+  }
+
+  .capacity-bar {
+    flex-basis: 100%;
+    height: 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.15);
+    overflow: hidden;
+  }
+  .capacity-bar-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #ffd86b, #fa71cd);
+    transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .capacity-banner.full .capacity-bar-fill {
+    background: linear-gradient(90deg, #ef4444, #fa71cd);
+  }
+
+  /* Disabled form overlay */
+  .form-card.locked { position: relative; }
+  .form-card.locked fieldset { opacity: 0.45; pointer-events: none; filter: saturate(0.5); }
+  .form-card .lock-overlay {
+    display: none;
+    position: absolute; inset: 0;
+    border-radius: 24px;
+    background: rgba(30, 10, 50, 0.55);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    z-index: 5;
+  }
+  .form-card.locked .lock-overlay { display: flex; }
+  .lock-overlay .box {
+    background: linear-gradient(135deg, #ef4444, #fa71cd);
+    padding: 22px 32px;
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+  }
+  .lock-overlay .big {
+    font-size: 40px; font-weight: 900; letter-spacing: 6px;
+    color: #fff;
+    text-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  }
+  .lock-overlay .small {
+    font-size: 14px; color: rgba(255, 255, 255, 0.95); margin-top: 6px; letter-spacing: 1px;
+  }
+
+  fieldset { border: 0; padding: 0; margin: 0; }
+
   @media (max-width: 600px) {
     .container { padding: 32px 16px 60px; }
     .hero { padding: 40px 18px 32px; }
@@ -477,10 +571,30 @@
     </div>
   </div>
 
+  <!-- Capacity Banner -->
+  <div class="capacity-banner" id="capacityBanner" aria-live="polite">
+    <div class="left">
+      <span class="icon" id="capIcon">🎟️</span>
+      <div>
+        <div class="title" id="capTitle">名額載入中...</div>
+        <div class="sub" id="capSub">本活動限額 4 名，請把握機會！</div>
+      </div>
+    </div>
+    <div class="count-pill" id="capCount">- / 4</div>
+    <div class="capacity-bar"><div class="capacity-bar-fill" id="capBar"></div></div>
+  </div>
+
   <!-- Registration Form -->
   <h2 class="section-title">📝 立即報名</h2>
-  <section class="form-card">
+  <section class="form-card" id="formCard">
+    <div class="lock-overlay">
+      <div class="box">
+        <div class="big">🚫 額 滿</div>
+        <div class="small">報名已達上限 4 名，系統已停止受理</div>
+      </div>
+    </div>
     <form id="regForm" novalidate>
+      <fieldset id="formFieldset">
       <div class="form-grid">
 
         <div class="form-group">
@@ -558,8 +672,9 @@
       </div>
 
       <div class="submit-row">
-        <button type="submit" class="submit-btn">🚀 送出報名 ✨</button>
+        <button type="submit" class="submit-btn" id="submitBtn">🚀 送出報名 ✨</button>
       </div>
+      </fieldset>
     </form>
   </section>
 
@@ -593,21 +708,101 @@
 <script>
   // 部署 Apps Script 後，將 Web App URL 貼到這裡
   const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzvmnCfahxJTziKjGuy1bCYS8vUsiX3cCxbmT7Aolx-7Bpus84FdceAETos4HZWSSAGVQ/exec';
+  const MAX_CAPACITY = 4;
 
   const form = document.getElementById('regForm');
   const toast = document.getElementById('toast');
-  const submitBtn = form.querySelector('.submit-btn');
+  const submitBtn = document.getElementById('submitBtn');
+  const formCard = document.getElementById('formCard');
+  const fieldset = document.getElementById('formFieldset');
+
+  const capBanner = document.getElementById('capacityBanner');
+  const capIcon   = document.getElementById('capIcon');
+  const capTitle  = document.getElementById('capTitle');
+  const capSub    = document.getElementById('capSub');
+  const capCount  = document.getElementById('capCount');
+  const capBar    = document.getElementById('capBar');
+
+  let isFull = false;
 
   function showToast(message) {
     toast.textContent = message;
     toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 3000);
+    setTimeout(() => toast.classList.remove('show'), 3200);
+  }
+
+  function updateCapacityUI(total, capacity) {
+    const cap = capacity || MAX_CAPACITY;
+    const count = Math.min(total, cap);
+    const remaining = Math.max(0, cap - total);
+    const pct = Math.min(100, (total / cap) * 100);
+
+    capCount.textContent = `${count} / ${cap}`;
+    capBar.style.width = `${pct}%`;
+
+    if (total >= cap) {
+      isFull = true;
+      capBanner.classList.add('full');
+      capIcon.textContent = '🚫';
+      capTitle.textContent = '報名已額滿';
+      capSub.textContent = `本活動限額 ${cap} 名，系統已停止受理報名`;
+      formCard.classList.add('locked');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '🚫 報名已額滿';
+    } else {
+      isFull = false;
+      capBanner.classList.remove('full');
+      capIcon.textContent = remaining <= 1 ? '🔥' : '🎟️';
+      capTitle.textContent = remaining <= 1
+        ? `最後 ${remaining} 個名額！`
+        : `名額剩餘 ${remaining} 位`;
+      capSub.textContent = `本活動限額 ${cap} 名，請把握機會立即報名！`;
+      formCard.classList.remove('locked');
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '🚀 送出報名 ✨';
+    }
+  }
+
+  async function fetchCapacity() {
+    try {
+      const res = await fetch(`${APPS_SCRIPT_URL}?action=list&_=${Date.now()}`, {
+        method: 'GET', cache: 'no-store'
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (data.status !== 'success') throw new Error(data.message || 'fetch failed');
+      updateCapacityUI(data.total || 0, data.capacity || MAX_CAPACITY);
+      return data;
+    } catch (err) {
+      capTitle.textContent = '⚠️ 無法取得名額資訊';
+      capSub.textContent = '請稍後再試或聯繫主辦單位確認';
+      return null;
+    }
   }
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (isFull) {
+      showToast('🚫 報名已額滿，系統已停止受理');
+      return;
+    }
     if (!form.checkValidity()) {
       form.reportValidity();
+      return;
+    }
+
+    // 送出前再次確認名額
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '🔍 確認名額中...';
+    const latest = await fetchCapacity();
+    if (!latest) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '🚀 送出報名 ✨';
+      showToast('⚠️ 無法確認名額，請稍後再試');
+      return;
+    }
+    if (latest.full) {
+      showToast('🚫 很抱歉，報名名額已滿');
       return;
     }
 
@@ -623,8 +818,6 @@
       phone: formData.get('phone')
     };
 
-    const originalText = submitBtn.innerHTML;
-    submitBtn.disabled = true;
     submitBtn.innerHTML = '⏳ 送出中...';
 
     try {
@@ -636,13 +829,19 @@
       });
       showToast('🎉 報名成功！我們將以 Email 聯繫您 ✨');
       form.reset();
+      // 重新確認名額，若已滿會自動鎖定表單
+      setTimeout(fetchCapacity, 1500);
     } catch (err) {
       showToast('⚠️ 送出失敗，請稍後再試或聯繫主辦單位');
-    } finally {
       submitBtn.disabled = false;
-      submitBtn.innerHTML = originalText;
+      submitBtn.innerHTML = '🚀 送出報名 ✨';
     }
   });
+
+  // 載入時先檢查名額
+  fetchCapacity();
+  // 每 60 秒自動更新一次
+  setInterval(fetchCapacity, 60000);
 </script>
 
 </body>
