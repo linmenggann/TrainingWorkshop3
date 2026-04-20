@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>🎓 教學訓練計畫主持人工作坊 ✨</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --p1: #6a11cb;
+    --p2: #8e2de2;
+    --p3: #c471f5;
+    --p4: #fa71cd;
+    --accent: #ffd86b;
+    --glass: rgba(255, 255, 255, 0.12);
+    --glass-strong: rgba(255, 255, 255, 0.2);
+    --text: #ffffff;
+    --text-soft: rgba(255, 255, 255, 0.85);
+  }
+
+  html, body {
+    font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", "標楷體", sans-serif;
+    color: var(--text);
+    line-height: 1.7;
+    min-height: 100%;
+    overflow-x: hidden;
+  }
+
+  body {
+    background: linear-gradient(135deg, #1a0033 0%, #4a148c 25%, #6a11cb 50%, #8e2de2 75%, #c471f5 100%);
+    background-size: 400% 400%;
+    animation: gradientShift 18s ease infinite;
+    position: relative;
+  }
+
+  @keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  /* Floating bubbles */
+  .bubbles {
+    position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0;
+  }
+  .bubbles span {
+    position: absolute; bottom: -120px;
+    width: 40px; height: 40px; border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.25);
+    animation: rise linear infinite;
+  }
+  .bubbles span:nth-child(1)  { left: 8%;  width: 20px; height: 20px; animation-duration: 14s; }
+  .bubbles span:nth-child(2)  { left: 18%; width: 60px; height: 60px; animation-duration: 20s; animation-delay: 2s; }
+  .bubbles span:nth-child(3)  { left: 30%; width: 30px; height: 30px; animation-duration: 16s; animation-delay: 4s; }
+  .bubbles span:nth-child(4)  { left: 42%; width: 50px; height: 50px; animation-duration: 22s; animation-delay: 1s; }
+  .bubbles span:nth-child(5)  { left: 55%; width: 25px; height: 25px; animation-duration: 15s; animation-delay: 5s; }
+  .bubbles span:nth-child(6)  { left: 66%; width: 70px; height: 70px; animation-duration: 24s; animation-delay: 3s; }
+  .bubbles span:nth-child(7)  { left: 78%; width: 35px; height: 35px; animation-duration: 18s; animation-delay: 6s; }
+  .bubbles span:nth-child(8)  { left: 88%; width: 45px; height: 45px; animation-duration: 21s; animation-delay: 2.5s; }
+  .bubbles span:nth-child(9)  { left: 48%; width: 28px; height: 28px; animation-duration: 17s; animation-delay: 7s; }
+  .bubbles span:nth-child(10) { left: 72%; width: 55px; height: 55px; animation-duration: 23s; animation-delay: 1.5s; }
+
+  @keyframes rise {
+    0%   { transform: translateY(0) scale(1); opacity: 0; }
+    10%  { opacity: 0.8; }
+    90%  { opacity: 0.6; }
+    100% { transform: translateY(-110vh) scale(1.2); opacity: 0; }
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 60px 24px 80px;
+  }
+
+  /* ====== Hero ====== */
+  .hero {
+    text-align: center;
+    padding: 50px 24px 40px;
+    border-radius: 28px;
+    background: var(--glass);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: "";
+    position: absolute; inset: -50%;
+    background: radial-gradient(circle at 20% 30%, rgba(255, 216, 107, 0.25), transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(250, 113, 205, 0.25), transparent 40%);
+    animation: spin 24s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .hero > * { position: relative; z-index: 1; }
+
+  .badge {
+    display: inline-block;
+    padding: 8px 18px;
+    background: linear-gradient(135deg, #ffd86b, #fa71cd);
+    color: #4a148c;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 24px rgba(250, 113, 205, 0.4);
+    animation: pulse 2.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
+  .hero h1 {
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 900;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #ffffff 0%, #ffd86b 50%, #fa71cd 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    letter-spacing: 2px;
+  }
+
+  .hero .subtitle {
+    font-size: clamp(16px, 2vw, 20px);
+    color: var(--text-soft);
+    margin-bottom: 24px;
+  }
+
+  .emoji-row {
+    font-size: 40px;
+    letter-spacing: 12px;
+    margin: 18px 0 4px;
+    animation: bounce 2s ease-in-out infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  /* ====== Info Cards ====== */
+  .section-title {
+    margin: 50px 0 24px;
+    font-size: 28px;
+    font-weight: 800;
+    text-align: center;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+    margin-bottom: 10px;
+  }
+
+  .info-card {
+    background: var(--glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 28px 24px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .info-card::after {
+    content: "";
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.08) 50%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+  }
+
+  .info-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    background: var(--glass-strong);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+  }
+
+  .info-card:hover::after {
+    transform: translateX(100%);
+  }
+
+  .info-card .icon {
+    font-size: 52px;
+    margin-bottom: 12px;
+    display: inline-block;
+    animation: wiggle 3s ease-in-out infinite;
+  }
+
+  .info-card:nth-child(2) .icon { animation-delay: 0.4s; }
+  .info-card:nth-child(3) .icon { animation-delay: 0.8s; }
+
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-8deg); }
+    75% { transform: rotate(8deg); }
+  }
+
+  .info-card .label {
+    font-size: 14px;
+    color: var(--text-soft);
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+  }
+
+  .info-card .value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .info-card .value small {
+    display: block;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-soft);
+    margin-top: 4px;
+  }
+
+  /* ====== Registration Form ====== */
+  .form-card {
+    background: var(--glass);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 24px;
+    padding: 36px 32px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+  }
+
+  .form-group { display: flex; flex-direction: column; }
+  .form-group.full { grid-column: 1 / -1; }
+
+  .form-group label {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #fff;
+    letter-spacing: 1px;
+  }
+
+  .form-group label .emo { margin-right: 6px; }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  select {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    font-family: inherit;
+  }
+
+  input::placeholder { color: rgba(255, 255, 255, 0.6); }
+
+  input:focus, select:focus {
+    border-color: #ffd86b;
+    background: rgba(255, 255, 255, 0.22);
+    box-shadow: 0 0 0 4px rgba(255, 216, 107, 0.2);
+  }
+
+  select { cursor: pointer; appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg fill='white' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M7 10l5 5 5-5z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px;
+    padding-right: 40px;
+  }
+
+  select option { color: #333; background: #fff; }
+
+  .radio-group {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .radio-group label {
+    flex: 1;
+    min-width: 110px;
+    cursor: pointer;
+    display: block;
+    margin: 0;
+  }
+
+  .radio-group input { display: none; }
+
+  .radio-group .pill {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 18px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    font-weight: 600;
+    transition: all 0.25s ease;
+    text-align: center;
+  }
+
+  .radio-group label:hover .pill {
+    background: rgba(255, 255, 255, 0.22);
+    transform: translateY(-2px);
+  }
+
+  .radio-group input:checked + .pill {
+    background: linear-gradient(135deg, #ffd86b, #fa71cd);
+    color: #4a148c;
+    border-color: transparent;
+    box-shadow: 0 8px 20px rgba(250, 113, 205, 0.4);
+  }
+
+  .submit-row {
+    margin-top: 28px;
+    text-align: center;
+  }
+
+  .submit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 48px;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    color: #4a148c;
+    background: linear-gradient(135deg, #ffd86b, #fa71cd);
+    box-shadow: 0 12px 32px rgba(250, 113, 205, 0.45);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    font-family: inherit;
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 16px 40px rgba(250, 113, 205, 0.6);
+  }
+
+  .submit-btn:active { transform: translateY(0); }
+
+  /* ====== Contact ====== */
+  .contact-card {
+    margin-top: 40px;
+    background: var(--glass);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 28px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    text-align: center;
+  }
+
+  .contact-item .icon { font-size: 36px; margin-bottom: 8px; display: block; }
+  .contact-item .title { font-size: 14px; color: var(--text-soft); letter-spacing: 2px; margin-bottom: 4px; }
+  .contact-item .detail { font-size: 16px; font-weight: 700; color: #fff; }
+
+  footer {
+    margin-top: 50px;
+    text-align: center;
+    color: var(--text-soft);
+    font-size: 14px;
+    letter-spacing: 1px;
+  }
+
+  footer .heart {
+    display: inline-block;
+    animation: beat 1.2s ease-in-out infinite;
+  }
+
+  @keyframes beat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.25); }
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 40px;
+    transform: translateX(-50%) translateY(120%);
+    background: linear-gradient(135deg, #ffd86b, #fa71cd);
+    color: #4a148c;
+    padding: 14px 26px;
+    border-radius: 999px;
+    font-weight: 700;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+    transition: transform 0.4s ease;
+    z-index: 999;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 600px) {
+    .container { padding: 32px 16px 60px; }
+    .hero { padding: 40px 18px 32px; }
+    .form-card { padding: 24px 18px; }
+    .submit-btn { padding: 14px 32px; font-size: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bubbles" aria-hidden="true">
+  <span></span><span></span><span></span><span></span><span></span>
+  <span></span><span></span><span></span><span></span><span></span>
+</div>
+
+<main class="container">
+
+  <!-- Hero -->
+  <section class="hero">
+    <span class="badge">✨ 2026 年度工作坊 ✨</span>
+    <h1>🎓 教學訓練計畫主持人工作坊 🚀</h1>
+    <p class="subtitle">一同打造更卓越的教學訓練體系，點亮醫事教育新視野！</p>
+    <div class="emoji-row">🎯 💡 📚 🤝 🌟</div>
+  </section>
+
+  <!-- Info Cards -->
+  <h2 class="section-title">📌 活動資訊</h2>
+  <div class="info-grid">
+    <div class="info-card">
+      <span class="icon">📅</span>
+      <div class="label">DATE · 日期</div>
+      <div class="value">2026 / 01 / 25<small>星期日</small></div>
+    </div>
+    <div class="info-card">
+      <span class="icon">⏰</span>
+      <div class="label">TIME · 時間</div>
+      <div class="value">09:00 ~ 16:00<small>全日課程</small></div>
+    </div>
+    <div class="info-card">
+      <span class="icon">📍</span>
+      <div class="label">VENUE · 地點</div>
+      <div class="value">奇美醫院<small>第五醫療大樓 6 樓 563 會議室</small></div>
+    </div>
+  </div>
+
+  <!-- Registration Form -->
+  <h2 class="section-title">📝 立即報名</h2>
+  <section class="form-card">
+    <form id="regForm" novalidate>
+      <div class="form-grid">
+
+        <div class="form-group">
+          <label for="name"><span class="emo">🙋</span>姓名</label>
+          <input type="text" id="name" name="name" placeholder="請輸入您的姓名" required />
+        </div>
+
+        <div class="form-group">
+          <label for="org"><span class="emo">🏥</span>機構名</label>
+          <input type="text" id="org" name="org" placeholder="請輸入服務機構" required />
+        </div>
+
+        <div class="form-group">
+          <label for="title"><span class="emo">💼</span>職稱</label>
+          <input type="text" id="title" name="title" placeholder="請輸入您的職稱" required />
+        </div>
+
+        <div class="form-group">
+          <label for="profession"><span class="emo">⚕️</span>負責的職類</label>
+          <select id="profession" name="profession" required>
+            <option value="" disabled selected>請選擇負責職類</option>
+            <option>💊 藥事</option>
+            <option>🩻 醫事放射</option>
+            <option>🧪 醫事檢驗</option>
+            <option>👩‍⚕️ 護理</option>
+            <option>🥗 營養</option>
+            <option>🫁 呼吸治療</option>
+            <option>👂 聽力</option>
+            <option>🦵 物理治療</option>
+            <option>✋ 職能治療</option>
+            <option>🧠 臨床心理</option>
+            <option>🗣️ 語言治療</option>
+            <option>✨ 其他</option>
+          </select>
+        </div>
+
+        <div class="form-group full">
+          <label><span class="emo">🎯</span>您目前是否擔任教學訓練計畫主持人</label>
+          <div class="radio-group">
+            <label>
+              <input type="radio" name="isHost" value="是" required />
+              <span class="pill">✅ 是，我是主持人</span>
+            </label>
+            <label>
+              <input type="radio" name="isHost" value="否" />
+              <span class="pill">🚫 否，尚未擔任</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group full">
+          <label><span class="emo">🎟️</span>您預計以何種方式參與</label>
+          <div class="radio-group">
+            <label>
+              <input type="radio" name="mode" value="實體" required />
+              <span class="pill">🏛️ 實體參與</span>
+            </label>
+            <label>
+              <input type="radio" name="mode" value="線上" />
+              <span class="pill">💻 線上參與</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email"><span class="emo">📧</span>Email</label>
+          <input type="email" id="email" name="email" placeholder="example@email.com" required />
+        </div>
+
+        <div class="form-group">
+          <label for="phone"><span class="emo">📱</span>聯繫電話</label>
+          <input type="tel" id="phone" name="phone" placeholder="09xx-xxx-xxx" required />
+        </div>
+
+      </div>
+
+      <div class="submit-row">
+        <button type="submit" class="submit-btn">🚀 送出報名 ✨</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- Contact -->
+  <h2 class="section-title">📞 聯絡資訊</h2>
+  <section class="contact-card">
+    <div class="contact-item">
+      <span class="icon">🏛️</span>
+      <div class="title">主辦單位</div>
+      <div class="detail">奇美醫院 教學部</div>
+    </div>
+    <div class="contact-item">
+      <span class="icon">👤</span>
+      <div class="title">聯絡人</div>
+      <div class="detail">陳大頭</div>
+    </div>
+    <div class="contact-item">
+      <span class="icon">☎️</span>
+      <div class="title">聯繫電話</div>
+      <div class="detail">06-281-2811 分機 57112233</div>
+    </div>
+  </section>
+
+  <footer>
+    <p>🌈 Made with <span class="heart">💜</span> by 奇美醫院教學部 · 2026 教學訓練計畫主持人工作坊</p>
+  </footer>
+</main>
+
+<div class="toast" id="toast">🎉 報名資料已準備完成！</div>
+
+<script>
+  const form = document.getElementById('regForm');
+  const toast = document.getElementById('toast');
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2600);
+    form.reset();
+  });
+</script>
+
+</body>
+</html>
