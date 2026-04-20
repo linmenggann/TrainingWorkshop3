@@ -65,11 +65,49 @@ function doPost(e) {
 
 /**
  * 讓部署後能以 GET 測試是否正常回應
+ * 另支援 ?action=list 回傳所有報名資料，供 dashboard.html 讀取
  */
-function doGet() {
+function doGet(e) {
+  const action = (e && e.parameter && e.parameter.action) || '';
+  if (action === 'list') {
+    return getRegistrationsResponse();
+  }
   return jsonResponse({
     status: 'ok',
     message: '教學訓練計畫主持人工作坊報名 API 正常運作中 🎉'
+  });
+}
+
+/**
+ * 讀取整個分頁資料，回傳 JSON 供 dashboard 使用
+ */
+function getRegistrationsResponse() {
+  const sheet = getOrCreateSheet();
+  const lastRow = sheet.getLastRow();
+  const lastCol = sheet.getLastColumn();
+
+  if (lastRow < 2) {
+    return jsonResponse({ status: 'success', headers: HEADERS, rows: [], total: 0 });
+  }
+
+  const values = sheet.getRange(1, 1, lastRow, lastCol).getValues();
+  const headers = values[0];
+  const rows = values.slice(1)
+    .filter(r => r.some(c => c !== '' && c !== null))
+    .map(r => {
+      const obj = {};
+      headers.forEach((h, i) => {
+        const v = r[i];
+        obj[h] = v instanceof Date ? v.toISOString() : v;
+      });
+      return obj;
+    });
+
+  return jsonResponse({
+    status: 'success',
+    headers: headers,
+    rows: rows,
+    total: rows.length
   });
 }
 

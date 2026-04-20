@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>📊 教學訓練計畫主持人工作坊 · 報名儀表板</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --p1: #6a11cb;
+    --p2: #8e2de2;
+    --p3: #c471f5;
+    --p4: #fa71cd;
+    --accent: #ffd86b;
+    --glass: rgba(255, 255, 255, 0.12);
+    --glass-strong: rgba(255, 255, 255, 0.2);
+    --text: #ffffff;
+    --text-soft: rgba(255, 255, 255, 0.85);
+    --text-dim: rgba(255, 255, 255, 0.65);
+  }
+
+  html, body {
+    font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100%;
+    overflow-x: hidden;
+  }
+
+  body {
+    background: linear-gradient(135deg, #1a0033 0%, #4a148c 25%, #6a11cb 50%, #8e2de2 75%, #c471f5 100%);
+    background-size: 400% 400%;
+    animation: gradientShift 18s ease infinite;
+    position: relative;
+    min-height: 100vh;
+  }
+
+  @keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  .bubbles { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+  .bubbles span {
+    position: absolute; bottom: -120px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    animation: rise linear infinite;
+  }
+  .bubbles span:nth-child(1) { left: 10%; width: 26px; height: 26px; animation-duration: 16s; }
+  .bubbles span:nth-child(2) { left: 25%; width: 60px; height: 60px; animation-duration: 22s; animation-delay: 3s; }
+  .bubbles span:nth-child(3) { left: 45%; width: 34px; height: 34px; animation-duration: 18s; animation-delay: 5s; }
+  .bubbles span:nth-child(4) { left: 65%; width: 50px; height: 50px; animation-duration: 24s; animation-delay: 1s; }
+  .bubbles span:nth-child(5) { left: 82%; width: 40px; height: 40px; animation-duration: 20s; animation-delay: 4s; }
+
+  @keyframes rise {
+    0%   { transform: translateY(0); opacity: 0; }
+    10%  { opacity: 0.8; }
+    100% { transform: translateY(-110vh); opacity: 0; }
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* Header */
+  header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    padding: 24px 28px;
+    background: var(--glass);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
+  }
+
+  header h1 {
+    font-size: clamp(22px, 3vw, 30px);
+    font-weight: 900;
+    letter-spacing: 1px;
+    background: linear-gradient(135deg, #fff, #ffd86b 60%, #fa71cd);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  header .sub {
+    font-size: 14px;
+    color: var(--text-soft);
+    margin-top: 4px;
+    letter-spacing: 1px;
+  }
+
+  .header-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.2s ease, background 0.2s ease;
+    font-family: inherit;
+  }
+  .btn:hover { background: rgba(255, 255, 255, 0.25); transform: translateY(-2px); }
+  .btn.primary {
+    background: linear-gradient(135deg, #ffd86b, #fa71cd);
+    color: #4a148c;
+    border-color: transparent;
+    box-shadow: 0 8px 20px rgba(250, 113, 205, 0.35);
+  }
+
+  .updated {
+    font-size: 13px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+  .updated .dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #4ade80;
+    margin-right: 6px;
+    box-shadow: 0 0 8px #4ade80;
+    animation: blink 1.6s ease-in-out infinite;
+  }
+  @keyframes blink { 50% { opacity: 0.3; } }
+
+  /* KPI */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+    margin-bottom: 32px;
+  }
+
+  .kpi {
+    background: var(--glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 22px 24px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .kpi:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25); }
+
+  .kpi .row { display: flex; align-items: center; justify-content: space-between; }
+  .kpi .icon { font-size: 38px; }
+  .kpi .label { font-size: 13px; color: var(--text-soft); letter-spacing: 2px; }
+  .kpi .value {
+    font-size: 42px;
+    font-weight: 900;
+    margin-top: 6px;
+    background: linear-gradient(135deg, #fff, #ffd86b);
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent;
+    line-height: 1.1;
+  }
+  .kpi .suffix { font-size: 16px; color: var(--text-soft); margin-left: 4px; font-weight: 400; }
+  .kpi .hint { font-size: 12px; color: var(--text-dim); margin-top: 6px; letter-spacing: 1px; }
+
+  /* Panels */
+  .panel-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+    margin-bottom: 22px;
+  }
+  @media (max-width: 900px) { .panel-grid { grid-template-columns: 1fr; } }
+
+  .panel {
+    background: var(--glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 24px 26px;
+  }
+
+  .panel h2 {
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 18px;
+    display: flex; align-items: center; gap: 8px;
+    letter-spacing: 1px;
+  }
+  .panel h2 .count { font-weight: 400; font-size: 13px; color: var(--text-dim); margin-left: auto; }
+
+  /* Horizontal bars */
+  .bars { display: flex; flex-direction: column; gap: 12px; }
+  .bar-row { display: grid; grid-template-columns: 110px 1fr 50px; gap: 10px; align-items: center; font-size: 14px; }
+  .bar-row .name { color: var(--text-soft); }
+  .bar-track {
+    height: 14px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    overflow: hidden;
+    position: relative;
+  }
+  .bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ffd86b, #fa71cd, #c471f5);
+    border-radius: 999px;
+    width: 0%;
+    transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .bar-row .num { text-align: right; font-weight: 700; }
+
+  /* Donut */
+  .donut-wrap { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; justify-content: center; }
+  .donut {
+    --p1-val: 0;
+    width: 160px; height: 160px; border-radius: 50%;
+    background: conic-gradient(#ffd86b 0% calc(var(--p1-val) * 1%), #fa71cd calc(var(--p1-val) * 1%) 100%);
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.8s ease;
+  }
+  .donut::before {
+    content: "";
+    position: absolute; inset: 16px;
+    border-radius: 50%;
+    background: rgba(30, 10, 50, 0.85);
+  }
+  .donut .center { position: relative; text-align: center; z-index: 1; }
+  .donut .center .big { font-size: 28px; font-weight: 900; }
+  .donut .center .small { font-size: 12px; color: var(--text-soft); letter-spacing: 2px; }
+
+  .legend { display: flex; flex-direction: column; gap: 10px; font-size: 14px; }
+  .legend .item { display: flex; align-items: center; gap: 8px; }
+  .legend .sw { width: 14px; height: 14px; border-radius: 4px; }
+  .legend .sw.a { background: #ffd86b; }
+  .legend .sw.b { background: #fa71cd; }
+  .legend .pct { margin-left: 10px; color: var(--text-soft); }
+
+  /* Table */
+  .table-panel { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    min-width: 720px;
+  }
+  thead th {
+    text-align: left;
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-soft);
+    font-weight: 700;
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  thead th:first-child { border-top-left-radius: 12px; }
+  thead th:last-child { border-top-right-radius: 12px; }
+  tbody td {
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    color: #fff;
+  }
+  tbody tr:hover { background: rgba(255, 255, 255, 0.06); }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .tag.on { background: rgba(74, 222, 128, 0.25); color: #bbf7d0; }
+  .tag.off { background: rgba(250, 113, 205, 0.25); color: #fbcfe8; }
+  .tag.phy { background: rgba(255, 216, 107, 0.25); color: #fde68a; }
+  .tag.web { background: rgba(147, 197, 253, 0.25); color: #bfdbfe; }
+
+  .empty, .loading, .error {
+    padding: 60px 24px;
+    text-align: center;
+    color: var(--text-soft);
+    font-size: 16px;
+  }
+  .loading .spinner {
+    display: inline-block;
+    width: 36px; height: 36px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #ffd86b;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 12px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .error { color: #fecaca; }
+  .error code {
+    display: inline-block;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    margin-top: 8px;
+  }
+
+  footer {
+    margin-top: 40px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 13px;
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+
+<div class="bubbles" aria-hidden="true">
+  <span></span><span></span><span></span><span></span><span></span>
+</div>
+
+<main class="container">
+
+  <header>
+    <div>
+      <h1>📊 工作坊報名現況儀表板</h1>
+      <div class="sub">教學訓練計畫主持人工作坊 · 2026/01/25 · 奇美醫院</div>
+    </div>
+    <div class="header-actions">
+      <span class="updated" id="updated"><span class="dot"></span>即時資料</span>
+      <button class="btn" id="refreshBtn">🔄 重新整理</button>
+      <a class="btn primary" href="index.html">📝 前往報名</a>
+    </div>
+  </header>
+
+  <!-- KPI -->
+  <section class="kpi-grid">
+    <div class="kpi">
+      <div class="row">
+        <div>
+          <div class="label">總報名人數</div>
+          <div class="value"><span id="kpiTotal">0</span><span class="suffix">人</span></div>
+          <div class="hint" id="kpiTotalHint">-</div>
+        </div>
+        <span class="icon">🎉</span>
+      </div>
+    </div>
+
+    <div class="kpi">
+      <div class="row">
+        <div>
+          <div class="label">實體參與</div>
+          <div class="value"><span id="kpiPhysical">0</span><span class="suffix">人</span></div>
+          <div class="hint" id="kpiPhysicalHint">-</div>
+        </div>
+        <span class="icon">🏛️</span>
+      </div>
+    </div>
+
+    <div class="kpi">
+      <div class="row">
+        <div>
+          <div class="label">線上參與</div>
+          <div class="value"><span id="kpiOnline">0</span><span class="suffix">人</span></div>
+          <div class="hint" id="kpiOnlineHint">-</div>
+        </div>
+        <span class="icon">💻</span>
+      </div>
+    </div>
+
+    <div class="kpi">
+      <div class="row">
+        <div>
+          <div class="label">現任主持人</div>
+          <div class="value"><span id="kpiHost">0</span><span class="suffix">人</span></div>
+          <div class="hint" id="kpiHostHint">-</div>
+        </div>
+        <span class="icon">🎯</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Charts -->
+  <section class="panel-grid">
+    <div class="panel">
+      <h2>⚕️ 負責職類分布 <span class="count" id="profCount">0 類</span></h2>
+      <div class="bars" id="professionBars">
+        <div class="empty">尚無資料</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>🎟️ 參與方式比例</h2>
+      <div class="donut-wrap">
+        <div class="donut" id="modeDonut">
+          <div class="center">
+            <div class="big" id="modeCenter">0%</div>
+            <div class="small">實體比例</div>
+          </div>
+        </div>
+        <div class="legend">
+          <div class="item"><span class="sw a"></span>🏛️ 實體 <span class="pct" id="modePhyPct">0 人 · 0%</span></div>
+          <div class="item"><span class="sw b"></span>💻 線上 <span class="pct" id="modeOnlinePct">0 人 · 0%</span></div>
+        </div>
+      </div>
+
+      <h2 style="margin-top: 28px;">🎯 是否擔任主持人</h2>
+      <div class="bars" id="hostBars"></div>
+    </div>
+  </section>
+
+  <!-- Table -->
+  <section class="panel table-panel">
+    <h2>🗂️ 最新報名名單 <span class="count" id="tableCount">共 0 筆</span></h2>
+    <div id="tableWrap">
+      <div class="loading"><div class="spinner"></div><div>讀取中...</div></div>
+    </div>
+  </section>
+
+  <footer>
+    <p>🌈 資料來源：Google Sheets「工作坊報名資料」 · 奇美醫院教學部</p>
+  </footer>
+
+</main>
+
+<script>
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzvmnCfahxJTziKjGuy1bCYS8vUsiX3cCxbmT7Aolx-7Bpus84FdceAETos4HZWSSAGVQ/exec';
+
+  const PROFESSION_ORDER = ['藥事','醫事放射','醫事檢驗','護理','營養','呼吸治療','聽力','物理治療','職能治療','臨床心理','語言治療','其他'];
+  const PROFESSION_EMOJI = {
+    '藥事': '💊', '醫事放射': '🩻', '醫事檢驗': '🧪', '護理': '👩‍⚕️',
+    '營養': '🥗', '呼吸治療': '🫁', '聽力': '👂', '物理治療': '🦵',
+    '職能治療': '✋', '臨床心理': '🧠', '語言治療': '🗣️', '其他': '✨'
+  };
+
+  const els = {
+    updated: document.getElementById('updated'),
+    refresh: document.getElementById('refreshBtn'),
+    kpiTotal: document.getElementById('kpiTotal'),
+    kpiTotalHint: document.getElementById('kpiTotalHint'),
+    kpiPhysical: document.getElementById('kpiPhysical'),
+    kpiPhysicalHint: document.getElementById('kpiPhysicalHint'),
+    kpiOnline: document.getElementById('kpiOnline'),
+    kpiOnlineHint: document.getElementById('kpiOnlineHint'),
+    kpiHost: document.getElementById('kpiHost'),
+    kpiHostHint: document.getElementById('kpiHostHint'),
+    professionBars: document.getElementById('professionBars'),
+    profCount: document.getElementById('profCount'),
+    modeDonut: document.getElementById('modeDonut'),
+    modeCenter: document.getElementById('modeCenter'),
+    modePhyPct: document.getElementById('modePhyPct'),
+    modeOnlinePct: document.getElementById('modeOnlinePct'),
+    hostBars: document.getElementById('hostBars'),
+    tableCount: document.getElementById('tableCount'),
+    tableWrap: document.getElementById('tableWrap')
+  };
+
+  els.refresh.addEventListener('click', () => load(true));
+
+  function fmtTs(val) {
+    if (!val) return '-';
+    const d = new Date(val);
+    if (isNaN(d)) return String(val);
+    const pad = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}/${pad(d.getMonth()+1)}/${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  function pct(n, total) {
+    if (!total) return 0;
+    return Math.round((n / total) * 1000) / 10;
+  }
+
+  function cleanProfession(raw) {
+    if (!raw) return '其他';
+    const s = String(raw).replace(/[\s\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '').trim();
+    for (const name of PROFESSION_ORDER) {
+      if (s.includes(name)) return name;
+    }
+    return s || '其他';
+  }
+
+  function setText(el, v) { el.textContent = v; }
+
+  async function load(force) {
+    if (force) {
+      els.tableWrap.innerHTML = '<div class="loading"><div class="spinner"></div><div>讀取中...</div></div>';
+    }
+    try {
+      const url = `${APPS_SCRIPT_URL}?action=list&_=${Date.now()}`;
+      const res = await fetch(url, { method: 'GET', cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (data.status !== 'success') throw new Error(data.message || '未知錯誤');
+      render(data.rows || []);
+      const now = new Date();
+      els.updated.innerHTML = `<span class="dot"></span>最後更新 ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
+    } catch (err) {
+      els.tableWrap.innerHTML = `
+        <div class="error">
+          ⚠️ 讀取資料失敗：${err.message}<br/>
+          請確認 Apps Script 已重新部署並允許所有人存取。<br/>
+          <code>${APPS_SCRIPT_URL}?action=list</code>
+        </div>`;
+    }
+  }
+
+  function render(rows) {
+    const total = rows.length;
+
+    const modeCount = { '實體': 0, '線上': 0 };
+    const hostCount = { '是': 0, '否': 0 };
+    const profCount = {};
+
+    rows.forEach(r => {
+      const mode = String(r['參與方式'] || '').trim();
+      if (mode.includes('實體')) modeCount['實體']++;
+      else if (mode.includes('線上')) modeCount['線上']++;
+
+      const isHost = String(r['是否擔任教學訓練計畫主持人'] || '').trim();
+      if (isHost === '是') hostCount['是']++;
+      else if (isHost === '否') hostCount['否']++;
+
+      const prof = cleanProfession(r['負責的職類']);
+      profCount[prof] = (profCount[prof] || 0) + 1;
+    });
+
+    // KPIs
+    setText(els.kpiTotal, total);
+    setText(els.kpiPhysical, modeCount['實體']);
+    setText(els.kpiOnline, modeCount['線上']);
+    setText(els.kpiHost, hostCount['是']);
+    setText(els.kpiTotalHint, total === 0 ? '等待第一位報名者 🎯' : `目前已有 ${total} 位夥伴加入`);
+    setText(els.kpiPhysicalHint, `佔比 ${pct(modeCount['實體'], total)}%`);
+    setText(els.kpiOnlineHint, `佔比 ${pct(modeCount['線上'], total)}%`);
+    setText(els.kpiHostHint, `佔比 ${pct(hostCount['是'], total)}%`);
+
+    // Profession bars
+    const profEntries = Object.entries(profCount).sort((a, b) => b[1] - a[1]);
+    setText(els.profCount, `${profEntries.length} 類`);
+    if (profEntries.length === 0) {
+      els.professionBars.innerHTML = '<div class="empty">尚無資料</div>';
+    } else {
+      const max = profEntries[0][1];
+      els.professionBars.innerHTML = profEntries.map(([name, count]) => {
+        const width = max > 0 ? (count / max) * 100 : 0;
+        const emoji = PROFESSION_EMOJI[name] || '✨';
+        return `
+          <div class="bar-row">
+            <div class="name">${emoji} ${name}</div>
+            <div class="bar-track"><div class="bar-fill" style="width:${width}%"></div></div>
+            <div class="num">${count}</div>
+          </div>`;
+      }).join('');
+    }
+
+    // Mode donut
+    const modeTotal = modeCount['實體'] + modeCount['線上'];
+    const phyPct = modeTotal ? (modeCount['實體'] / modeTotal) * 100 : 0;
+    els.modeDonut.style.setProperty('--p1-val', phyPct);
+    setText(els.modeCenter, `${Math.round(phyPct)}%`);
+    setText(els.modePhyPct, `${modeCount['實體']} 人 · ${pct(modeCount['實體'], modeTotal)}%`);
+    setText(els.modeOnlinePct, `${modeCount['線上']} 人 · ${pct(modeCount['線上'], modeTotal)}%`);
+
+    // Host bars
+    const hostTotal = hostCount['是'] + hostCount['否'];
+    const hostMax = Math.max(hostCount['是'], hostCount['否'], 1);
+    els.hostBars.innerHTML = [
+      { k: '是', emoji: '✅', label: '擔任主持人' },
+      { k: '否', emoji: '🚫', label: '尚未擔任' }
+    ].map(({ k, emoji, label }) => {
+      const c = hostCount[k];
+      const w = (c / hostMax) * 100;
+      return `
+        <div class="bar-row">
+          <div class="name">${emoji} ${label}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${w}%"></div></div>
+          <div class="num">${c}</div>
+        </div>`;
+    }).join('');
+
+    // Table - latest first
+    setText(els.tableCount, `共 ${total} 筆`);
+    if (total === 0) {
+      els.tableWrap.innerHTML = '<div class="empty">🌱 尚無報名資料，等待第一位夥伴加入！</div>';
+      return;
+    }
+    const sorted = rows.slice().sort((a, b) => {
+      const ta = new Date(a['時間戳記']).getTime() || 0;
+      const tb = new Date(b['時間戳記']).getTime() || 0;
+      return tb - ta;
+    });
+    const rowsHtml = sorted.map(r => {
+      const mode = String(r['參與方式'] || '').trim();
+      const isHost = String(r['是否擔任教學訓練計畫主持人'] || '').trim();
+      const prof = cleanProfession(r['負責的職類']);
+      const emoji = PROFESSION_EMOJI[prof] || '✨';
+      const modeTag = mode.includes('實體')
+        ? '<span class="tag phy">🏛️ 實體</span>'
+        : mode.includes('線上')
+          ? '<span class="tag web">💻 線上</span>'
+          : '-';
+      const hostTag = isHost === '是'
+        ? '<span class="tag on">✅ 是</span>'
+        : isHost === '否'
+          ? '<span class="tag off">🚫 否</span>'
+          : '-';
+      return `
+        <tr>
+          <td>${fmtTs(r['時間戳記'])}</td>
+          <td>${escapeHtml(r['姓名'] || '-')}</td>
+          <td>${escapeHtml(r['機構名'] || '-')}</td>
+          <td>${escapeHtml(r['職稱'] || '-')}</td>
+          <td>${emoji} ${prof}</td>
+          <td>${hostTag}</td>
+          <td>${modeTag}</td>
+        </tr>`;
+    }).join('');
+    els.tableWrap.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>報名時間</th><th>姓名</th><th>機構</th><th>職稱</th>
+            <th>職類</th><th>主持人</th><th>參與方式</th>
+          </tr>
+        </thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>`;
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  load(true);
+  setInterval(() => load(false), 30000);
+</script>
+
+</body>
+</html>
