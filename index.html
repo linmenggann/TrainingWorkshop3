@@ -591,18 +591,57 @@
 <div class="toast" id="toast">🎉 報名資料已準備完成！</div>
 
 <script>
+  // 部署 Apps Script 後，將 Web App URL 貼到這裡
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/REPLACE_WITH_YOUR_DEPLOYMENT_ID/exec';
+
   const form = document.getElementById('regForm');
   const toast = document.getElementById('toast');
+  const submitBtn = form.querySelector('.submit-btn');
 
-  form.addEventListener('submit', (e) => {
+  function showToast(message) {
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!form.checkValidity()) {
       form.reportValidity();
       return;
     }
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2600);
-    form.reset();
+
+    const formData = new FormData(form);
+    const payload = {
+      name: formData.get('name'),
+      org: formData.get('org'),
+      title: formData.get('title'),
+      profession: formData.get('profession'),
+      isHost: formData.get('isHost'),
+      mode: formData.get('mode'),
+      email: formData.get('email'),
+      phone: formData.get('phone')
+    };
+
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '⏳ 送出中...';
+
+    try {
+      await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+      showToast('🎉 報名成功！我們將以 Email 聯繫您 ✨');
+      form.reset();
+    } catch (err) {
+      showToast('⚠️ 送出失敗，請稍後再試或聯繫主辦單位');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalText;
+    }
   });
 </script>
 
