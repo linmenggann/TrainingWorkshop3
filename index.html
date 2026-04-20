@@ -28,10 +28,30 @@
   }
 
   body {
-    background: linear-gradient(135deg, #1a0033 0%, #4a148c 25%, #6a11cb 50%, #8e2de2 75%, #c471f5 100%);
+    min-height: 100vh;
+    position: relative;
+    background-image: url('%E5%B8%83%E9%9B%B7%E8%A5%BF%E4%BA%9E%E5%BB%B3%E7%89%B9%E5%B1%95.jpg');
+    background-size: cover;
+    background-position: center center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+  }
+
+  /* 紫色漸層動態覆蓋層：讓照片透出又保持可讀性 */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(135deg,
+      rgba(26, 0, 51, 0.78) 0%,
+      rgba(74, 20, 140, 0.72) 25%,
+      rgba(106, 17, 203, 0.65) 50%,
+      rgba(142, 45, 226, 0.60) 75%,
+      rgba(196, 113, 245, 0.55) 100%);
     background-size: 400% 400%;
     animation: gradientShift 18s ease infinite;
-    position: relative;
+    pointer-events: none;
   }
 
   @keyframes gradientShift {
