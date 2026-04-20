@@ -17,6 +17,7 @@
 
 const SPREADSHEET_ID = '17oIoMn_V45j5-vHfIm0GioNcfvtXDktEpNtpLmM8fFo';
 const SHEET_NAME = '工作坊報名資料';
+const MAX_CAPACITY = 4;
 
 const HEADERS = [
   '時間戳記',
@@ -39,6 +40,17 @@ function doPost(e) {
 
   try {
     const sheet = getOrCreateSheet();
+    const currentCount = Math.max(0, sheet.getLastRow() - 1);
+
+    if (currentCount >= MAX_CAPACITY) {
+      return jsonResponse({
+        status: 'full',
+        message: '報名已額滿',
+        total: currentCount,
+        capacity: MAX_CAPACITY
+      });
+    }
+
     const data = parseIncomingData(e);
 
     const row = [
@@ -55,7 +67,12 @@ function doPost(e) {
 
     sheet.appendRow(row);
 
-    return jsonResponse({ status: 'success', message: '報名成功！' });
+    return jsonResponse({
+      status: 'success',
+      message: '報名成功！',
+      total: currentCount + 1,
+      capacity: MAX_CAPACITY
+    });
   } catch (err) {
     return jsonResponse({ status: 'error', message: String(err) });
   } finally {
@@ -87,7 +104,15 @@ function getRegistrationsResponse() {
   const lastCol = sheet.getLastColumn();
 
   if (lastRow < 2) {
-    return jsonResponse({ status: 'success', headers: HEADERS, rows: [], total: 0 });
+    return jsonResponse({
+      status: 'success',
+      headers: HEADERS,
+      rows: [],
+      total: 0,
+      capacity: MAX_CAPACITY,
+      remaining: MAX_CAPACITY,
+      full: false
+    });
   }
 
   const values = sheet.getRange(1, 1, lastRow, lastCol).getValues();
@@ -107,7 +132,10 @@ function getRegistrationsResponse() {
     status: 'success',
     headers: headers,
     rows: rows,
-    total: rows.length
+    total: rows.length,
+    capacity: MAX_CAPACITY,
+    remaining: Math.max(0, MAX_CAPACITY - rows.length),
+    full: rows.length >= MAX_CAPACITY
   });
 }
 

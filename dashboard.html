@@ -181,6 +181,36 @@
   .kpi .suffix { font-size: 16px; color: var(--text-soft); margin-left: 4px; font-weight: 400; }
   .kpi .hint { font-size: 12px; color: var(--text-dim); margin-top: 6px; letter-spacing: 1px; }
 
+  .cap-track { margin-top: 14px; height: 8px; border-radius: 999px; background: rgba(255,255,255,0.12); overflow: hidden; }
+  .cap-fill { height: 100%; width: 0%; border-radius: 999px;
+    background: linear-gradient(90deg, #ffd86b, #fa71cd);
+    transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .kpi.full {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(250, 113, 205, 0.25));
+    border-color: rgba(252, 165, 165, 0.55);
+    animation: capPulse 2.4s ease-in-out infinite;
+  }
+  .kpi.full .cap-fill { background: linear-gradient(90deg, #ef4444, #fa71cd); }
+  @keyframes capPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.45); }
+    50% { box-shadow: 0 0 0 14px rgba(239, 68, 68, 0); }
+  }
+
+  .full-badge {
+    display: inline-block;
+    margin-left: 10px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    background: #ef4444;
+    color: #fff;
+    vertical-align: middle;
+    animation: blink 1.2s ease-in-out infinite;
+  }
+
   /* Panels */
   .panel-grid {
     display: grid;
@@ -339,7 +369,7 @@
 
   <header>
     <div>
-      <h1>📊 工作坊報名現況儀表板</h1>
+      <h1>📊 工作坊報名現況儀表板 <span id="fullBadge" class="full-badge" style="display:none;">額滿</span></h1>
       <div class="sub">教學訓練計畫主持人工作坊 · 2026/01/25 · 奇美醫院</div>
     </div>
     <div class="header-actions">
@@ -351,15 +381,16 @@
 
   <!-- KPI -->
   <section class="kpi-grid">
-    <div class="kpi">
+    <div class="kpi" id="kpiTotalCard">
       <div class="row">
         <div>
-          <div class="label">總報名人數</div>
-          <div class="value"><span id="kpiTotal">0</span><span class="suffix">人</span></div>
+          <div class="label">總報名人數 / 上限</div>
+          <div class="value"><span id="kpiTotal">0</span><span class="suffix" id="kpiTotalOf">/ 4</span></div>
           <div class="hint" id="kpiTotalHint">-</div>
         </div>
-        <span class="icon">🎉</span>
+        <span class="icon" id="kpiTotalIcon">🎉</span>
       </div>
+      <div class="cap-track"><div class="cap-fill" id="kpiCapFill"></div></div>
     </div>
 
     <div class="kpi">
@@ -441,6 +472,7 @@
 
 <script>
   const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzvmnCfahxJTziKjGuy1bCYS8vUsiX3cCxbmT7Aolx-7Bpus84FdceAETos4HZWSSAGVQ/exec';
+  const MAX_CAPACITY = 4;
 
   const PROFESSION_ORDER = ['藥事','醫事放射','醫事檢驗','護理','營養','呼吸治療','聽力','物理治療','職能治療','臨床心理','語言治療','其他'];
   const PROFESSION_EMOJI = {
@@ -452,6 +484,11 @@
   const els = {
     updated: document.getElementById('updated'),
     refresh: document.getElementById('refreshBtn'),
+    fullBadge: document.getElementById('fullBadge'),
+    kpiTotalCard: document.getElementById('kpiTotalCard'),
+    kpiTotalIcon: document.getElementById('kpiTotalIcon'),
+    kpiTotalOf: document.getElementById('kpiTotalOf'),
+    kpiCapFill: document.getElementById('kpiCapFill'),
     kpiTotal: document.getElementById('kpiTotal'),
     kpiTotalHint: document.getElementById('kpiTotalHint'),
     kpiPhysical: document.getElementById('kpiPhysical'),
@@ -507,7 +544,11 @@
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       if (data.status !== 'success') throw new Error(data.message || '未知錯誤');
-      render(data.rows || []);
+      render(data.rows || [], {
+        capacity: data.capacity || MAX_CAPACITY,
+        full: !!data.full,
+        remaining: typeof data.remaining === 'number' ? data.remaining : null
+      });
       const now = new Date();
       els.updated.innerHTML = `<span class="dot"></span>最後更新 ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
     } catch (err) {
@@ -520,8 +561,11 @@
     }
   }
 
-  function render(rows) {
+  function render(rows, meta) {
     const total = rows.length;
+    const capacity = (meta && meta.capacity) || MAX_CAPACITY;
+    const remaining = (meta && meta.remaining != null) ? meta.remaining : Math.max(0, capacity - total);
+    const full = (meta && meta.full) || total >= capacity;
 
     const modeCount = { '實體': 0, '線上': 0 };
     const hostCount = { '是': 0, '否': 0 };
@@ -542,10 +586,27 @@
 
     // KPIs
     setText(els.kpiTotal, total);
+    setText(els.kpiTotalOf, `/ ${capacity}`);
     setText(els.kpiPhysical, modeCount['實體']);
     setText(els.kpiOnline, modeCount['線上']);
     setText(els.kpiHost, hostCount['是']);
-    setText(els.kpiTotalHint, total === 0 ? '等待第一位報名者 🎯' : `目前已有 ${total} 位夥伴加入`);
+
+    const capPct = Math.min(100, (total / capacity) * 100);
+    els.kpiCapFill.style.width = capPct + '%';
+
+    if (full) {
+      els.kpiTotalCard.classList.add('full');
+      els.kpiTotalIcon.textContent = '🚫';
+      els.fullBadge.style.display = 'inline-block';
+      setText(els.kpiTotalHint, '🚫 報名已額滿，系統已停止受理');
+    } else {
+      els.kpiTotalCard.classList.remove('full');
+      els.kpiTotalIcon.textContent = remaining <= 1 ? '🔥' : '🎉';
+      els.fullBadge.style.display = 'none';
+      setText(els.kpiTotalHint, total === 0
+        ? `等待第一位報名者 🎯（名額 ${capacity}）`
+        : `剩餘 ${remaining} 位名額`);
+    }
     setText(els.kpiPhysicalHint, `佔比 ${pct(modeCount['實體'], total)}%`);
     setText(els.kpiOnlineHint, `佔比 ${pct(modeCount['線上'], total)}%`);
     setText(els.kpiHostHint, `佔比 ${pct(hostCount['是'], total)}%`);
