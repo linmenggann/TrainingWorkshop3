@@ -7,7 +7,8 @@
 | 檔案 | 用途 |
 | --- | --- |
 | `index.html` | 活動資訊與報名表單網頁（紫色漸層 + 活潑 emoji 風格） |
-| `apps-script.gs` | Google Apps Script 後端，接收表單資料並寫入試算表 |
+| `dashboard.html` | 報名現況儀表板（KPI、職類分布、參與方式圓環、最新名單，每 30 秒自動更新） |
+| `apps-script.gs` | Google Apps Script 後端：`doPost` 寫入報名、`doGet?action=list` 提供 dashboard 資料 |
 | `教學訓練計畫主持人工作坊.docx` | 原始活動企劃文件 |
 
 ## 📝 Google Sheets 表頭設定
