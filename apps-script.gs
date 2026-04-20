@@ -102,9 +102,10 @@ function getOrCreateSheet() {
 function parseIncomingData(e) {
   if (!e) return {};
   if (e.postData && e.postData.contents) {
-    const type = e.postData.type || '';
-    if (type.indexOf('application/json') !== -1) {
-      try { return JSON.parse(e.postData.contents); } catch (err) { /* fallthrough */ }
+    try {
+      return JSON.parse(e.postData.contents);
+    } catch (err) {
+      // 非 JSON 內容則回退到 form parameters
     }
   }
   return e.parameter || {};
